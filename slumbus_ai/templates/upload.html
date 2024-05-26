@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPICE 모델 오디오 분석</title>
+</head>
+<body>
+    <h1>오디오 파일 업로드 또는 녹음</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+
+    <button id="startButton">녹음 시작</button>
+    <button id="stopButton" disabled>녹음 끝내기</button>
+    <script>
+        let recorder;
+        let chunks = [];
+
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+
+        startButton.addEventListener('click', startRecording);
+        stopButton.addEventListener('click', stopRecording);
+
+        function startRecording() {
+            console.log('Recording...');
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    recorder = new MediaRecorder(stream);
+                    recorder.ondataavailable = e => chunks.push(e.data);
+                    recorder.start();
+                    stopButton.disabled = false;
+                    startButton.disabled = true;
+                })
+                .catch(err => {
+                    console.error('Error starting recording:', err);
+                });
+        }
+
+        function stopRecording() {
+            console.log('Recording stopped');
+            recorder.onstop = () => {
+                const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = audioUrl;
+                a.download = 'recorded_audio.wav';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(audioUrl);
+            };
+            recorder.stop();
+            startButton.disabled = false;
+            stopButton.disabled = true;
+        }
+    </script>
+</body>
+</html>
