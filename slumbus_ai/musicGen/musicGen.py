@@ -15,7 +15,7 @@ MusicGen = Namespace('generate-music')
 @MusicGen.route('/music')
 class MusicGenerator(Resource):
     def get(self):
-        ## 1
+        ##1
         # 파이프 라인 생성 -> text to audio 작업 수행
         # synthesiser = pipeline("text-to-audio", "facebook/musicgen-medium")
         # # 해당 inputs: 텍스트를 바탕으로 오디오 생성 , do_sample:True -> 샘플링 활성화로 무작위성 확보
