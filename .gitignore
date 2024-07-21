@@ -170,3 +170,6 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/flask
+
+# 음악 로컬 저장 경로
+slumbus_ai/musicFile/
