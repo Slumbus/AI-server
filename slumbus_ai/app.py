@@ -3,12 +3,14 @@ from spice import process_audio
 
 from flask_restx import Api, Resource
 from musicGen.musicGen import MusicGen
+from musicGen.musicGenMelody import MusicGenMelody
 from chatGPT.chatGpt import LyricsWriter
 
 app = Flask(__name__) #FLASK 객체 선언, 애플리케이션 패키지 이름 넣기
 api = Api(app) #Flask 객체에 APi 객체 등록
 
 api.add_namespace(MusicGen, '/test')
+api.add_namespace(MusicGenMelody, '/compose')
 api.add_namespace(LyricsWriter, '/lyrics')
 
 @app.route('/')
