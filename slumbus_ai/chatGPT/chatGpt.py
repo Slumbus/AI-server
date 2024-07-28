@@ -12,7 +12,7 @@ class WriteLyrics(Resource):
     def post(self):
         input = request.get_json()
 
-        kidName = input["kidName"]
+        lyrics = input["lyrics"]
 
         openai.api_key = os.environ["GPT_API_KEY"]
 
@@ -23,7 +23,7 @@ class WriteLyrics(Resource):
                 {"role": "system", "content": "사용자가 요청하는 조건에 따라 작사를 해라."},
                 {"role": "system", "content": "작사된 가사만 반환해라."},
                 {"role": "system", "content": "작사할 내용은 자장가의 가사이다."},
-                {"role": "user", "content": f"${kidName}이 아이의 이름이다. 아이의 이름이 들어가도록 작사해라."},
+                {"role": "user", "content": f"${lyrics}는 사용자의 요청사항이다. 요청사항을 반영해서 작사해라."},
             ],
             temperature=0.8,
             max_tokens=2048
