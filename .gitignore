@@ -173,3 +173,5 @@ cython_debug/
 
 # 음악 로컬 저장 경로
 slumbus_ai/musicFile/
+slumbus_ai/musicGen/config.py
+slumbus_ai/musicFile/config.py

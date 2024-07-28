@@ -54,7 +54,7 @@ class MusicComposer(Resource):
                 fileUrl = f'https://{BUCKET_NAME}.s3.ap-southeast-2.amazonaws.com/{fileName}'
                 urls.append(fileUrl)
 
-        return jsonify({"message": "Music composition and upload successful", "data": urls})
+        return jsonify({"message": "음악 생성 성공", "data": urls})
 
 
 def convert_audio_for_model(user_file, output_file='converted_audio_file.wav'):
