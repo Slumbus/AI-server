@@ -19,6 +19,8 @@ s3 = s3_connection()
 class MusicComposer(Resource):
     def post(self):
 
+        global fileUrl
+
         file = request.files['file']
         file_stream = BytesIO(file.read())
 
@@ -32,16 +34,16 @@ class MusicComposer(Resource):
             f"music style is {mood} and instruments are {instrument}"
         ]
 
-        output_file = convert_audio_for_model(file_stream)
+        # wav 파일이 아니라면 변환해주기
+        # output_file = convert_audio_for_model(file_stream)
 
-        melody, sr = torchaudio.load(output_file) # 여기에 입력 받은 파일
+        melody, sr = torchaudio.load(file_stream) # 여기에 입력 받은 파일
 
         # 한 개의 채널로 음악 생성
         wav = model.generate_with_chroma(descriptions, melody[None],sr)
         # 세 개의 채널의 음악 생성
         # wav = model.generate_with_chroma(descriptions, melody[None].expand(3, -1, -1), sr) # 1:mono, 2:stereo, 3:multichannel
 
-        urls = []
         for idx, one_wav in enumerate(wav):
             # Will save under {idx}.wav, with loudness normalization at -14 db LUFS.
             buffer = BytesIO()
@@ -52,10 +54,8 @@ class MusicComposer(Resource):
             fileName = f'music/{uuid.uuid4()}.wav'
             if uploadToS3(buffer, BUCKET_NAME, fileName):
                 fileUrl = f'https://{BUCKET_NAME}.s3.ap-southeast-2.amazonaws.com/{fileName}'
-                urls.append(fileUrl)
 
-        return jsonify({"message": "음악 생성 성공", "data": urls})
-
+        return jsonify({"music": fileUrl})
 
 def convert_audio_for_model(user_file, output_file='converted_audio_file.wav'):
     audio = AudioSegment.from_file(user_file)
