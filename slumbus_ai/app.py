@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_file, render_template
-from spice import process_audio
+from musicGen.spice import process_audio
 
-from flask_restx import Api, Resource
+from flask_restx import Api
 from musicGen.musicGen import MusicGen
 from musicGen.musicGenMelody import MusicGenMelody
 from chatGPT.chatGpt import LyricsWriter
@@ -24,6 +24,7 @@ def upload_file():
         return jsonify(error="No file part"), 400
 
     file = request.files['file']
+
     # If the user does not select a file, the browser submits an empty file without a filename
     if file.filename == '':
         return jsonify(error="No selected file"), 400
