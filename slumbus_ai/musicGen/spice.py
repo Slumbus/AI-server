@@ -1,6 +1,12 @@
+import io
 import logging
 import math
 import statistics
+import tempfile
+from flask import request, jsonify, send_file
+from io import BytesIO
+
+import os
 
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -8,6 +14,8 @@ import numpy as np
 from scipy.io import wavfile
 from pydub import AudioSegment
 import music21
+from music21 import midi, stream
+
 
 # Logger 설정
 logger = logging.getLogger()
@@ -25,10 +33,12 @@ model = hub.load("https://tfhub.dev/google/spice/2")
 
 
 def convert_audio_for_model(user_file, output_file='converted_audio_file.wav'):
-    audio = AudioSegment.from_file(user_file)
-    audio = audio.set_frame_rate(EXPECTED_SAMPLE_RATE).set_channels(1)
-    audio.export(output_file, format="wav")
-    return output_file
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
+        audio = AudioSegment.from_file(user_file)
+        audio = audio.set_frame_rate(EXPECTED_SAMPLE_RATE).set_channels(1)
+        audio.export(temp_file.name, format="wav")
+    return temp_file.name
 
 
 def output2hz(pitch_output):
@@ -134,7 +144,34 @@ def process_audio(file_path):
         else:
             sc.append(music21.note.Note(snote, type=d))
 
-    midi_file = file_path[:-4] + '.mid'
-    sc.write('midi', fp=midi_file)
 
-    return midi_file
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.mid') as temp_file:
+        temp_file_path = temp_file.name
+
+    sc.write('midi', fp=temp_file_path)
+
+    print("스파이스 피치 추출 완료")
+
+    return convert_audio_for_model(temp_file_path)
+
+def upload_file(file):
+
+    #임시 파일 객체 확인
+    if isinstance(file, tempfile._TemporaryFileWrapper):
+        file_path = file.name
+    else:
+        # Check if the post request has the file part
+        if 'file' not in request.files:
+            return jsonify(error="No file part"), 400
+
+        # If the user does not select a file, the browser submits an empty file without a filename
+        if file.filename == '':
+            return jsonify(error="No selected file"), 400
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
+            file.save(temp_file.name)
+            file_path = temp_file.name
+
+    midi_file = process_audio(file_path)
+
+    return send_file(midi_file, as_attachment=True)
