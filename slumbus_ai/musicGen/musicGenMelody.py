@@ -36,7 +36,7 @@ class MusicComposer(Resource):
         model.set_generation_params(duration=8)
 
         descriptions = [
-            f"write a lullaby for a child. The atmosphere of the lullaby should be {mood} and only use {instrument} as instrument"
+            f"lullaby for a baby.The mood of the song should be {mood}.use {instrument} as main instrument. smooth, cozy and slow."
         ]
 
         with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
