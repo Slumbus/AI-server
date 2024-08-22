@@ -19,11 +19,13 @@ class WriteLyrics(Resource):
         completion = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages = [
-                {"role": "system", "content": "너는 작사가이다."},
-                {"role": "system", "content": "사용자가 요청하는 조건에 따라 작사를 해라."},
-                {"role": "system", "content": "작사된 가사만 반환해라."},
-                {"role": "system", "content": "작사할 내용은 자장가의 가사이다."},
-                {"role": "user", "content": f"${lyrics}는 사용자의 요청사항이다. 요청사항을 반영해서 작사해라."},
+                {"role": "system", "content": "You are a lyricist for children's lullaby."},
+                {"role": "system", "content": "Write the lyrics according to the user's request."},
+                {"role": "system", "content": "The lyrics must be in Korean."},
+                {"role": "system", "content": "Just return the lyrics of the lullaby you wrote."},
+                {"role": "system", "content": "The lyrics are for a lullaby for a child."},
+                {"role": "system", "content": "If there is no request, just return the Korean lullaby lyrics"},
+                {"role": "user", "content": f"${lyrics} is my request. reflect this and write the lyrics"},
             ],
             temperature=0.8,
             max_tokens=2048
