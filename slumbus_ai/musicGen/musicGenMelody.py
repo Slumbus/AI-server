@@ -27,13 +27,12 @@ class MusicComposer(Resource):
         global fileUrl
 
         file = request.files['file']
-        # file_stream = BytesIO(file.read())
 
         mood = request.form.get('mood')
         instrument = request.form.get('instrument')
 
         model = MusicGen.get_pretrained('melody')
-        model.set_generation_params(duration=8)
+        model.set_generation_params(duration=60)
 
         descriptions = [
             f"lullaby for a baby.The mood of the song should be {mood}.use {instrument} as main instrument. smooth, cozy and slow."
